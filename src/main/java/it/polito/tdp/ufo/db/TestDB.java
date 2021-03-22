@@ -13,55 +13,15 @@ public class TestDB {
 
 	public static void main(String[] args) {
 		
-		String jdbcURL = "jdbc:mysql://localhost/ufo_sightings?user=root&password=TdP21";
+		SightingDAO dao = new SightingDAO();
 		
-		try {
-			Connection conn = DriverManager.getConnection(jdbcURL);
-			//Attenzione ad importare le giuste classi (a livelli alti .sql o .xsql)
-			
-			String sql = "SELECT DISTINCT shape "
-					+ "FROM sighting "
-					+ "WHERE shape<>'' "
-					+ "ORDER BY shape ASC";
-			
-			//Statement st = conn.createStatement();
-			PreparedStatement st = conn.prepareStatement(sql);
-			
-			/*String sql = "SELECT DISTINCT shape "
-					+ "FROM sighting "
-					+ "WHERE shape<>'' "
-					+ "ORDER BY shape ASC";*/
-			
-			ResultSet res = st.executeQuery(sql);
-			
-			List<String> formeUfo = new ArrayList<String>();
-			while ( res.next() ) {
-				String forma = res.getString("shape");
-				formeUfo.add(forma);
-			}
-			st.close();
-			
-			System.out.println(formeUfo);
-			
-			String sql2 = "SELECT COUNT(*) AS cnt "
-					+ "FROM sighting "
-					+ "WHERE shape= ?";
-			String shapeScelta = "circle";
-			
-			PreparedStatement st2 = conn.prepareStatement(sql2);
-			st2.setString(1, shapeScelta);
-			ResultSet res2 = st2.executeQuery();
-			res2.first();
-			int count = res2.getInt("cnt");
-			System.out.println("UFO di forma " + shapeScelta +" sono: " + count);
-			st2.close();
-			
-			conn.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		List<String> formeUFO = dao.readShapes();
+		
+		for (String forma : formeUFO) {
+			int count = dao.countByShape(forma);
+			System.out.println("La forma "+ forma +" è presente " + count +" volte.");
 		}
 
-	}
+}
 
 }
